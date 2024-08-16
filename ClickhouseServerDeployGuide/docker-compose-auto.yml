@@ -1,0 +1,45 @@
+version: "3.1"
+
+services:
+
+  clickhouse:
+    build:
+      context: .
+      dockerfile: auto.Dockerfile
+    restart: on-failure
+    ports:
+      - "8443:8443"
+      - "9440:9440"
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-default}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:?InvalidClickhouseUser}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?InvalidClickhousePassword}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - ./clickhouse-data:/var/lib/clickhouse
+      - ./docker/clickhouse-users.xml:/etc/clickhouse-server/users.xml:ro
+      - ./docker/clickhouse-config-ssl.xml:/etc/clickhouse-server/config.xml:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    stop_grace_period: 60s
+
+  grafana:
+    image: grafana/grafana-enterprise:10.2.2
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:?InvalidGrafanaUser}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:?InvalidGrafanaPassword}
+      GF_INSTALL_PLUGINS: "grafana-clickhouse-datasource"
+      GF_SERVER_PROTOCOL: "https"
+      GF_SERVER_CERT_FILE: "/etc/certificate/grafana.crt"
+      GF_SERVER_CERT_KEY: "/etc/certificate/grafana.key"
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+      - ./docker/certificate/grafana:/etc/certificate:ro
+    user: ${GRAFANA_UID:-0}
+    depends_on:
+      - clickhouse

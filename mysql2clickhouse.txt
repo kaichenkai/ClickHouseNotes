@@ -1,0 +1,17 @@
+mysql2clickhouse
+
+clickhouse-mysql --src-host=127.0.0.1 --src-port=3309 --src-user=root --src-password=KSwhmysql1qaz@WSX.  --src-schema=kunion --src-tables=darkeye_domain --create-table-sql-template > create_darkeye_domain.sql
+
+
+clickhouse-mysql --src-host=127.0.0.1 --src-port=3309 --src-user=root --src-password=KSwhmysql1qaz@WSX. --src-schema=kunion --src-tables=darkeye_domain --migrate-table --dst-host=localhost --dst-port=9000 --dst-user=ch_user --dst-password=ch_password --dst-schema=ch_db --dst-table=darkeye_domain --mempool-max-rows-num=1000
+
+'clickhouse_mysql.writer.chwriter.CHWriter'> insert 1000 row(s)
+
+
+
+
+
+
+clickhouse-mysql --src-host=127.0.0.1 --src-port=3309 --src-user=root --src-password=KSwhmysql1qaz@WSX. --src-schema=kunion --src-tables=darkeye_domain --migrate-table --dst-host=localhost --dst-port=9000 --dst-user=ch_user --dst-password=ch_password --dst-schema=ch_db
+
+
